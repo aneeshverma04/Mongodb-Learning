@@ -1,0 +1,162 @@
+/*
+python -m pip install pymongo
+python -m pip install --upgrade pymongo
+
+
+service mongod status
+
+*/
+
+
+To start : 
+==================================================================================
+> mongo
+// db.help() ... db.stats()
+
+TO use, create :
+==================================================================================
+> show dbs
+> use NameOfWhateverDatabase // if currently there then use that otherwise will create a new 							  // db.. use dbName serves as a command to create a new db also
+// To know currently using database.. > db
+> show dbs // our new db will not show as need atleast one document to it
+
+>db.collectionName.insert({"name": "Aneesh"}) // In MongoDB, you don't need to create 
+											 //collection(BUT SHOULD IN SOME CASES). 
+		  									//MongoDB creates collection automatically, when 
+		  								   //you insert some document.
+To drop : 
+==================================================================================
+> db.dropDatabase()  // while being in that database only
+
+To create,drop,read collections :
+==================================================================================
+# db.createCollection(name, options) // check about options in References file
+> db.createCollection("justName1")
+> db.createCollection("justName2",{capped:true , autoIndexId : true , size : 1000 , max:500})
+> show collections 					// show/read all collections
+> db.collectionName.find()			// show/read a particular collection
+> db.justName1.drop() // collection dropped .. returns true
+*** Updating a collection ... maybe later..Alligator
+
+To insert Documents :
+==================================================================================
+> db.collectionName.insert({"name": "Aneesh"}) // In the inserted document, if we don't 												  //specify the _id parameter, then MongoDB 
+											 //assigns a unique ObjectId for this document.
+> db.justName1.insert([
+	{ 
+		title : 'Doc1',
+		tags : ['a','ab','abc']			//To insert multiple documents in a single query, you 
+										can pass an array of documents in insert() command.
+	},
+	{
+		desc : "aa",
+		like:0
+	}
+	])
+
+To Query Documents (find(), find().pretty(), lt,lte,gt,gte,ne,and,or):
+// Refer References file
+==================================================================================
+> db.COLLECTION_NAME.find()
+> db.mycol.find().pretty() // formatted
+> db.mycol.findOne() // returns only one
+> db.justName1.find({"desc":"aa"}).pretty() // where desc = aa
+> db.justName1.find({"like":{$lt:1}}).pretty() // like < 1
+> db.justName1.find({"like":{$lte:0}}).pretty() // like <=0
+> db.justName1.find({"like":{$gt:-1}}).pretty() // like > -1
+> db.justName1.find({"like":{$gte:0}}).pretty() // like >= 0
+> db.justName1.find({"like":{$ne:0}}).pretty() // like != 0 // returns other document even if 															 //attribute of "like" is not there
+> db.justName1.find( {
+     $or : [
+              { desc : "aa"},{title:"Doc1"} 		// "desc" or desc .. both works
+            ]
+  } ).pretty()
+
+> db.justName1.find( { 
+    $and: [ 										// Both conditions should satisfy
+            { "desc" : "aa"} , {like:0}     
+            ] 
+  } ).pretty()
+
+> db.justName1.find({	
+   desc:"aa",$or: [{like:0},{like:1}]			   // desc:"aa" AND (like = 0 or like = 1)  
+   }).pretty()
+
+
+To Update Documents ( $set() , save())
+====================================================================================
+
+# db.COLLECTION_NAME.update(SELECTION_CRITERIA, UPDATED_DATA)
+
+> db.justName1.update({like:0},{$set:{like:1}})  // By default, MongoDB will update only a 
+													single document. To update multiple documents, you need to set a parameter 'multi' to true.
+> db.justName2.insert([
+{ 
+name:"Aneesh",
+id : 1,
+place : "Chandigarh"
+},
+{
+name:"Parul",
+id : 2,
+place : "Chandigarh"
+}
+])
+
+> db.justName2.update({place:"Chandigarh"},{$set:{place:"Punjab"}},{multi:true}) 
+
+
+>  db.justName2.save({
+ 	"_id" : ObjectId("5a75818ecae3145c49b5e36e"), // save completely replaces a Document 
+ 													with whatever we specify
+ 	"id" : 3 , "name":"Nancy"
+ 	}
+	 )
+/*
+
+db.justName2.save(
+   {
+      "_id" : ObjectId(5a75818ecae3145c49b5e36d), "title":"Tutorials Point New Topic","by":"Tutorials Point"})
+
+*/
+
+
+To Delete Documents
+=================================================================================
+
+# remove() method
+"""
+remove() method accepts two parameters. One is deletion criteria and second is justOne flag.
+
+deletion criteria − (Optional) deletion criteria according to documents will be removed.
+
+justOne − (Optional) if set to true or 1, then remove only one document.
+
+
+#### CANT DELETE FROM CAPPED COLLETIONS
+"""
+> db.justName3.insert([
+{
+id : 1,
+name:"Aneesh",
+place:"Chandigarh"
+},
+{
+id : 1 ,
+name:"Parul",
+place:"Chandigarh"
+},
+{
+id : 3,
+name:"Nancy",
+place:"Chandigarh"
+},
+{
+id : 3,
+name:"ALPHA",
+place:"Punjab"	
+}
+])
+> db.justName3.remove({id:1}) // all with id 1 removed
+> db.justName3.remove({id:3})// Just one with id 3 removed
+> db.justName3.remove() 	// All Documents removed 
